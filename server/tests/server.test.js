@@ -8,11 +8,14 @@ const { Todo } = require("../models/todo");
 const todos = [
   {
     _id: new ObjectID(),
-    text: "Learn to use Tristana"
+    text: "Learn to use Tristana",
+    completed: false
   },
   {
     _id: new ObjectID(),
-    text: "Kick ass with Warwick"
+    text: "Kick ass with Warwick",
+    completed: true,
+    completedAt: 129747163874
   }
 ];
 
@@ -108,7 +111,7 @@ describe("GET /todos/:id", () => {
 
 describe("DELETE /todos/:id", () => {
   it("should remove a todo", done => {
-    var hexId = todos[0]._id.toHexString();
+    const hexId = todos[0]._id.toHexString();
     request(app)
       .delete(`/todos/${hexId}`)
       .expect(200)
@@ -140,6 +143,51 @@ describe("DELETE /todos/:id", () => {
     request(app)
       .delete(`/todos/12345678}`)
       .expect(404)
+      .end(done);
+  });
+});
+
+describe("PATCH /todos/:id", () => {
+  beforeEach(done => {
+    Todo.remove({})
+      .then(() => {
+        return Todo.insertMany(todos);
+      })
+      .then(() => done());
+  });
+
+  it("should update the todo", done => {
+    const hexId = todos[0]._id.toHexString();
+    const updates = {
+      completed: true,
+      text: "master playing with Caitlyn"
+    };
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send(updates)
+      .expect(200)
+      .expect(res => {
+        const updatedObject = res.body.todo;
+        expect(updatedObject.text).toBe(updates.text);
+        expect(updatedObject.completed).toBe(true);
+        expect(updatedObject.completedAt).toBeA("number");
+      })
+      .end(done);
+  });
+
+  it("should clear completedAt when todo is not completed", done => {
+    const hexId = todos[1]._id.toHexString();
+    const updates = { completed: false, text: "Master warwick" };
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send(updates)
+      .expect(200)
+      .expect(res => {
+        const updatedObject = res.body.todo;
+        expect(updatedObject.text).toBe(updates.text);
+        expect(updatedObject.completed).toBe(false);
+        expect(updatedObject.completedAt).toBe(null);
+      })
       .end(done);
   });
 });
