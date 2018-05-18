@@ -13,7 +13,7 @@ const UserSchema = new mongoose.Schema({
     unique: true,
     validate: {
       validator: validator.isEmail,
-      message: "(VALUE) is not a valid email"
+      message: "{VALUE} is not a valid email"
     }
   },
   password: {
@@ -86,9 +86,9 @@ UserSchema.statics.findByCredentials = function(email, password) {
       bcrypt.compare(password, user.password, (err, result) => {
         if (result) {
           return resolve(user);
+        } else {
+          return reject();
         }
-
-        return reject();
       });
     });
   });
