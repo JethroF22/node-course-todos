@@ -24,7 +24,15 @@ const users = [
   {
     _id: userTwoID,
     email: "user2@gmail.com",
-    password: "user2@"
+    password: "user2@",
+    tokens: [
+      {
+        access: "auth",
+        token: jwt
+          .sign({ _id: userTwoID, access: "auth" }, "secretvalue")
+          .toString()
+      }
+    ]
   }
 ];
 
@@ -32,15 +40,25 @@ const todos = [
   {
     _id: new ObjectID(),
     text: "Learn to use Tristana",
-    completed: false
+    completed: false,
+    _creator: userOneID
   },
   {
     _id: new ObjectID(),
     text: "Kick ass with Warwick",
     completed: true,
-    completedAt: 129747163874
+    completedAt: 129747163874,
+    _creator: userTwoID
   }
 ];
+
+const populateTodos = done => {
+  Todo.remove({})
+    .then(() => {
+      return Todo.insertMany(todos);
+    })
+    .then(() => done());
+};
 
 const populateUsers = done => {
   User.remove({})
@@ -57,5 +75,6 @@ const populateUsers = done => {
 module.exports = {
   todos,
   users,
-  populateUsers
+  populateUsers,
+  populateTodos
 };
