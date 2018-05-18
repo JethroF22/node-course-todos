@@ -14,7 +14,7 @@ const hashedPassword =
   "$2a$10$c51YPH/hXKPEW.a9FgnpW.drLHpOuAJlVPhagAVQelXG9a1Db8PIq";
 
 bcrypt.compare(password, hashedPassword, (err, result) => {
-  console.log(res);
+  console.log("Result:", result);
 });
 
 const data = {
